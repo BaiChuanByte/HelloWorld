@@ -30,7 +30,7 @@ See the [languages list](./LANGUAGES.md).
     - C: `gcc -o hello hello.c`
     - C++: `g++ -o hello hello.cpp`
     - Brainfuck: `brainfuck hello.bf`
-    - b̶r̶a̶i̶n̶f̶u̶c̶k̶: `python3 -m __hello__ hello.any`
+    - ~~Brainfuck~~: `python3 -m __hello__ hello.any`
     - Hello, golf!: `python3 -m __hello__ hello.any`
     - All other No-code esolang (provided they output Hello World): `python3 -m __hello__ hello.any`
 

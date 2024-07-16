@@ -30,7 +30,7 @@
     - C: `gcc -o hello hello.c`
     - C++: `g++ -o hello hello.cpp`
     - Brainfuck: `brainfuck hello.bf`
-    - B̶r̶a̶i̶n̶f̶u̶c̶k̶: `python3 -m __hello__ hello.any`
+    - ~~Brainfuck~~: `python3 -m __hello__ hello.any`
     - Hello, golf!: `python3 -m __hello__ hello.any`
     - 其他所有无语法Esolang（前提是他们输出HelloWorld）: `python3 -m __hello__ hello.any`
 
