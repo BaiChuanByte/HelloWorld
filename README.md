@@ -1,6 +1,6 @@
 # HelloWorld
 
-English | [简体中文](./README_zh.md)
+English | [简体中文](./doc_zh/README_zh.md)
 
 A Hello World program written in many programming languages.
 

@@ -1,6 +1,6 @@
 # HelloWorld
 
-[English](./README.md) | 简体中文
+[English](../README.md) | 简体中文
 
 一个使用许多语言编写而成的HelloWorld程序。
 
