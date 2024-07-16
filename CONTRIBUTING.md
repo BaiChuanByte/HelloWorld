@@ -23,9 +23,9 @@ The exclamation mark should be half angled.
 
 2. You can help us build documents.
 
--Welcome to correct or help modify parts of the document that are unnatural, have grammar errors, or do not convey the intended meaning.
+- Welcome to correct or help modify parts of the document that are unnatural, have grammar errors, or do not convey the intended meaning.
 
--Welcome to help us translate the document into other languages.
+- Welcome to help us translate the document into other languages.
 
 
 If you have any other opinions, please feel free to discuss with us.
