@@ -24,6 +24,7 @@ import json
 console = console.Console()
 
 PYTHON_OR_PYTHON3 = "python"
+# MUST PYTHON !!!
 BF_GEI_MIRROR = "https://github.com/pocmo/Python-Brainfuck.git"
 BF_MAIN_FILE = "brainfuck.py"
 
@@ -241,6 +242,8 @@ def test_brainfuck_language():
 
     os.system(
         f"python ./Python-Brainfuck/{BF_MAIN_FILE} ./Python-Brainfuck/hello.bf > ./Python-Brainfuck/output.txt"
+        if PYTHON_OR_PYTHON3 == "python"
+        else f"python3 ./Python-Brainfuck/{BF_MAIN_FILE} ./Python-Brainfuck/hello.bf > ./Python-Brainfuck/output.txt"
     )
     console.log(
         "Output of the program is in ./Python-Brainfuck/output.txt file, but we will delete it after we checked the output."
