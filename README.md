@@ -45,6 +45,6 @@ This programm is licensed under the terms of the WTFPL
 See [license](./LICENSE).
 
 ## Other
-If you have any questions or suggestions, feel free to contact me at my email: bcbyte@foxmail.com.
+If you have any questions or suggestions, feel free to contact me at my email: baichuanbyte@tuta.io.
 
 Have fun!
