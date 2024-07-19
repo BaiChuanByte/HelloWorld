@@ -18,7 +18,22 @@ import shutil
 import sys
 import os
 import stat
-import json
+import time
+
+
+def test_function(lang):
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            start_time = time.time()
+            result = func(*args, **kwargs)
+            end_time = time.time()
+            elapsed_time = end_time - start_time
+            print(f"{lang}-test used: {elapsed_time:.6f}s")
+            return result
+
+        return wrapper
+
+    return decorator
 
 
 console = console.Console()
@@ -29,6 +44,7 @@ BF_GEI_MIRROR = "https://github.com/pocmo/Python-Brainfuck.git"
 BF_MAIN_FILE = "brainfuck.py"
 
 test_language_list = ["python", "c++", "c", "brainfuck"]
+done_languages = []
 
 
 """
@@ -103,6 +119,18 @@ def get_or_ask_config():
 """
 
 # CONFIG = get_or_ask_config()
+
+
+def print_beatiful_log(text, color="blod white", long=52):
+    # to print ===========[ text ]===========  total long is 50 and text is in middle
+    # str-long cannot be more than 40
+    half_long = long // 2
+    str_long = len(text) + 4
+    half_square_long = half_long - str_long // 2
+
+    console.print("=" * half_square_long, style=color, end="")
+    console.print(f"[ {text} ]", style=color, end="")
+    console.print("=" * half_square_long, style=color)
 
 
 def if_the_language_is_supported(language):
@@ -180,22 +208,23 @@ def check_the_environment():
 
 
 def delete_test_cache_directory():
-    console.print("Deleting test-cache directory...", style="bold bright_white")
+    print_beatiful_log("Cleaning up...", "bold yellow")
     try:
         shutil.rmtree("./test-cache")
     except OSError as e:
         print(
-            f"FUCKIT! Cannot deleted ./test-cache directory by shutil.rmtree() method \n because [[ {e} ]].\n But don't be worried.\n =============[ Trying force delete... ]==",
+            f"FUCKIT! Cannot deleted ./test-cache directory by shutil.rmtree() method \n because [[ {e} ]].\n But don't be worried.",
         )
+        print_beatiful_log("Trying force delete...", "bold yellow")
         force_remove_dir_contents("./test-cache")
         console.print("Cleaned up!", style="bold green")
-    console.print(
-        "===========[ ALL TESTS HAS BEEN DONE!!! ]==========", style="bold green"
-    )
+
+    print_beatiful_log("ALL TESTS HAS BEEN DONE!!!", "bold green")
 
 
+@test_function("Python")
 def test_python_language():
-    console.print("===========[ TESTING PYTHON ]==========", style="bold blue")
+    print_beatiful_log("TESTING PYTHON", "bold blue")
 
     # Python does not need any installation, just run the hello.any file
     console.log("Running hello.any file...")
@@ -206,23 +235,21 @@ def test_python_language():
     with open("./test-cache/python_output.txt", "r") as f:
         output = f.read()
         if "Hello world!\n" == output:
-            console.print(
-                "==========[ PYTHON TEST PASSED ]==========", style="bold green"
-            )
+            print_beatiful_log("PYTHON TEST PASSED", "bold green")
+            done_languages.append("python")
         else:
-            console.print(
-                "==========[ PYTHON TEST FAILED ]==========", style="bold red"
-            )
+            print_beatiful_log("PYTHON TEST FAILED", "bold red")
 
 
+@test_function("Brainfuck")
 def test_brainfuck_language():
-    console.print("===========[ TESTING BRAINF**K ]==========", style="bold blue")
+    print_beatiful_log("TESTING BRAINF**K", "bold blue")
 
     console.log("Installing brainf**k language...")
     # Install brainf**k language
 
     try:
-        os.system(f"git clone {BF_GEI_MIRROR} Python-Brainfuck ")
+        os.system(f"git clone {BF_GEI_MIRROR} ./test-cache/Python-Brainfuck ")
     except OSError as e:
         console.print(
             "Cannot clone from github.com. Please check your internet connection or mirrors.",
@@ -230,10 +257,10 @@ def test_brainfuck_language():
         )
         return
 
-    # os.chdir("./Python-Brainfuck")
+    # os.chdir("./test-cache/Python-Brainfuck")
 
     # 如果是linux使用mv,如果是windows使用move
-    shutil.copyfile("./hello.any", "./Python-Brainfuck/hello.bf")
+    shutil.copyfile("./hello.any", "./test-cache/Python-Brainfuck/hello.bf")
     # os.system(
     #     "powershell.exe -Command copy ../hello.any ./hello.bf "
     #     if os.name == "nt"
@@ -241,48 +268,47 @@ def test_brainfuck_language():
     # )
 
     os.system(
-        f"python ./Python-Brainfuck/{BF_MAIN_FILE} ./Python-Brainfuck/hello.bf > ./Python-Brainfuck/output.txt"
+        f"python ./test-cache/Python-Brainfuck/{BF_MAIN_FILE} ./test-cache/Python-Brainfuck/hello.bf > ./test-cache/Python-Brainfuck/output.txt"
         if PYTHON_OR_PYTHON3 == "python"
-        else f"python3 ./Python-Brainfuck/{BF_MAIN_FILE} ./Python-Brainfuck/hello.bf > ./Python-Brainfuck/output.txt"
+        else f"python3 ./test-cache/Python-Brainfuck/{BF_MAIN_FILE} ./test-cache/Python-Brainfuck/hello.bf > ./test-cache/Python-Brainfuck/output.txt"
     )
     console.log(
-        "Output of the program is in ./Python-Brainfuck/output.txt file, but we will delete it after we checked the output."
+        "Output of the program is in ./test-cache/Python-Brainfuck/output.txt file, but we will delete it after we checked the output."
     )
 
     # Check if the output is correct
-    with open("./Python-Brainfuck/output.txt", "r") as f:
+    with open("./test-cache/Python-Brainfuck/output.txt", "r") as f:
         output = f.read()
         # console.print('Hello world!\n')
         # console.print(repr(output))
 
         if "Hello world!\n" == output:
-            console.print("Test passed")
+            print_beatiful_log("BRAINF**K TEST PASSED", "bold green")
+            done_languages.append("brainfuck")
         else:
-            console.print("Test failed, maybe your mirror cannot use")
             console.print(
-                "===========[ BRAINF**K TEST FAILED ]==========X", style="bold red"
+                "Test failed, maybe your mirror cannot use or your internet is not good.And you can check hello.any file and try again."
             )
+            print_beatiful_log("BRAINF**K TEST FAILED", "bold red")
             return
 
-    console.print("Cleaning up...")
-    # os.chdir("..")
-    # os.system("rmdir /s /q  Python-Brainfuck")
+    # console.print("Cleaning up...")
+    # # os.chdir("..")
+    # # os.system("rmdir /s /q  Python-Brainfuck")
 
-    try:
-        shutil.rmtree("./Python-Brainfuck")
-    except OSError as e:
-        print(
-            f"FUCKIT! Cannot deleted ./Python-Brainfuck directory by shutil.rmtree() method \n because [[ {e} ]].\n But don't be worried.\n =============[ Trying force delete... ]============",
-        )
-        force_remove_dir_contents("./Python-Brainfuck")
-        console.print("Cleaned up!", style="bold green")
-
-    console.print("Done!")
-    console.print("===========[ BRAINF**K TEST PASSED]==========√", style="bold green")
+    # try:
+    #     shutil.rmtree("./test-cache/Python-Brainfuck")
+    # except OSError as e:
+    #     print(
+    #         f"FUCKIT! Cannot deleted ./test-cache/Python-Brainfuck directory by shutil.rmtree() method \n because [[ {e} ]].\n But don't be worried.\n =============[ Trying force delete... ]============",
+    #     )
+    #     force_remove_dir_contents("./test-cache/Python-Brainfuck")
+    #     console.print("Cleaned up!", style="bold green")
 
 
+@test_function("C")
 def test_c_language():
-    console.print("===========[ TESTING C ]==========", style="bold blue")
+    print_beatiful_log("TESTING C", "bold blue")
 
     console.log("Copying hello.any file...")
     # Copy hello.any file to ./test-cache/hello.c
@@ -308,14 +334,16 @@ def test_c_language():
     with open("./test-cache/c_output.txt", "r") as f:
         output = f.read()
         if "Hello world!\n" == output:
-            console.print("===========[ C TEST PASSED ]==========", style="bold green")
+            print_beatiful_log("C TEST PASSED", "bold green")
+            done_languages.append("c")
         else:
-            console.print("===========[ C TEST FAILED ]==========X", style="bold red")
+            print_beatiful_log("C TEST FAILED", "bold red")
             return
 
 
+@test_function("C++")
 def test_cpp_language():
-    console.print("===========[ TESTING C++ ]==========", style="bold blue")
+    print_beatiful_log("TESTING C++", "bold blue")
 
     console.log("Copying hello.any file...")
     # Copy hello.any file to ./test-cache/hello.cpp
@@ -341,14 +369,32 @@ def test_cpp_language():
     with open("./test-cache/cpp_output.txt", "r") as f:
         output = f.read()
         if "Hello world!\n" == output:
-            console.print(
-                "===========[ C++ TEST PASSED ]==========", style="bold green"
-            )
+            print_beatiful_log("C++ TEST PASSED", "bold green")
+            done_languages.append("c++")
         else:
-            console.print("===========[ C++ TEST FAILED ]==========X", style="bold red")
+            print_beatiful_log("C++ TEST FAILED", "bold red")
             return
 
 
+def summary():
+    print_beatiful_log("SUMMARY", "bold blue")
+    console.print("We have tested the following languages:", style="bold blue")
+    for lang in test_language_list:
+        if lang in done_languages:
+            if lang == "brainfuck":
+                console.print(f"\t{lang} \t[PASSED]", style="bold green")
+            else:
+                console.print(f"\t{lang} \t\t[PASSED]", style="bold green")
+        else:
+            if lang == "brainfuck":
+                console.print(f"\t{lang} \t[FAILED]", style="bold red")
+            else:
+                console.print(f"\t{lang} \t\t[FAILED]", style="bold red")
+
+    print_beatiful_log("ALL DONE! | THANKS FOR USING!", "bold green")
+
+
+@test_function("ALL")
 def main():
     check_the_environment()
     test_python_language()
@@ -356,6 +402,7 @@ def main():
     test_cpp_language()
     test_brainfuck_language()
     delete_test_cache_directory()
+    summary()
 
 
 if __name__ == "__main__":
