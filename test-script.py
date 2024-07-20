@@ -39,13 +39,16 @@ def test_function(lang):
 console = console.Console()
 
 PYTHON_OR_PYTHON3 = "python"
-# MUST PYTHON !!!
-BF_GEI_MIRROR = "https://github.com/pocmo/Python-Brainfuck.git"
-BF_MAIN_FILE = "brainfuck.py"
+
+# BF_GEI_MIRROR = "https://github.com/pocmo/Python-Brainfuck.git"
+# BF_MAIN_FILE = "brainfuck.py"
 
 test_language_list = ["python", "c++", "c", "brainfuck"]
 done_languages = []
 
+TEST_CACHE_DIR = "./test-cache"
+
+MAIN_MIRROR = "https://github.com/fexcode/esolangs"
 
 """
 
@@ -158,7 +161,7 @@ def force_remove_dir_contents(path):
     os.rmdir(path)
 
 
-def check_the_environment():
+def check_the_environment_and_init():
     global test_language_list
 
     console.print("Checking the environment...", style="bold blue")
@@ -182,6 +185,20 @@ def check_the_environment():
     if not shutil.which("git"):
         console.print("git is not installed on your system.", style="bold red")
         test_language_list.remove("brainfuck")
+    else:
+        TEST_CACHE_ESOLANGS_DIR = "./test-cache/esolangs/"
+        print_beatiful_log("Cloning the esolangs interpreters...", "bold blue")
+        try:
+            os.system(f"git clone {MAIN_MIRROR} {TEST_CACHE_ESOLANGS_DIR} ")
+            print_beatiful_log("Cloned the esolangs interpreters!", "bold green")
+            print_beatiful_log("Deleting the .git directory...", "bold blue")
+            force_remove_dir_contents(f"{TEST_CACHE_ESOLANGS_DIR}/.git")
+        except OSError as e:
+            console.print(
+                "Cannot clone from github.com. Please check your internet connection or mirrors.",
+                style="bold red",
+            )
+            return
 
     # Check hello.any file is present and it is in the current directory
     if not os.path.isfile("hello.any"):
@@ -243,44 +260,28 @@ def test_python_language():
 
 @test_function("Brainfuck")
 def test_brainfuck_language():
+    # esolang interpreters have installed in ./test-cache/esolangs already.
+
     print_beatiful_log("TESTING BRAINF**K", "bold blue")
 
-    console.log("Installing brainf**k language...")
-    # Install brainf**k language
+    TEST_CACHE_ESOLANGS_DIR = "./test-cache/esolangs"
 
-    try:
-        os.system(f"git clone {BF_GEI_MIRROR} ./test-cache/Python-Brainfuck ")
-    except OSError as e:
-        console.print(
-            "Cannot clone from github.com. Please check your internet connection or mirrors.",
-            style="bold red",
-        )
-        return
+    BRAINFUCK_ROOT_DIR = f"{TEST_CACHE_ESOLANGS_DIR}/brainfuck"
 
-    # os.chdir("./test-cache/Python-Brainfuck")
-
-    # 如果是linux使用mv,如果是windows使用move
-    shutil.copyfile("./hello.any", "./test-cache/Python-Brainfuck/hello.bf")
-    # os.system(
-    #     "powershell.exe -Command copy ../hello.any ./hello.bf "
-    #     if os.name == "nt"
-    #     else "cp ../hello.any ./hello.bf"
-    # )
+    shutil.copyfile("./hello.any", f"{BRAINFUCK_ROOT_DIR}/hello.bf")
 
     os.system(
-        f"python ./test-cache/Python-Brainfuck/{BF_MAIN_FILE} ./test-cache/Python-Brainfuck/hello.bf > ./test-cache/Python-Brainfuck/output.txt"
+        f"python {BRAINFUCK_ROOT_DIR}/main.py {BRAINFUCK_ROOT_DIR}/hello.bf > {BRAINFUCK_ROOT_DIR}/output.txt"
         if PYTHON_OR_PYTHON3 == "python"
-        else f"python3 ./test-cache/Python-Brainfuck/{BF_MAIN_FILE} ./test-cache/Python-Brainfuck/hello.bf > ./test-cache/Python-Brainfuck/output.txt"
+        else f"python3 {BRAINFUCK_ROOT_DIR}/main.py {BRAINFUCK_ROOT_DIR}/hello.bf > {BRAINFUCK_ROOT_DIR}/output.txt"
     )
     console.log(
-        "Output of the program is in ./test-cache/Python-Brainfuck/output.txt file, but we will delete it after we checked the output."
+        f"Output of the program is in {BRAINFUCK_ROOT_DIR}/output.txt file, but we will delete it after we checked the output."
     )
 
     # Check if the output is correct
-    with open("./test-cache/Python-Brainfuck/output.txt", "r") as f:
+    with open(f"{BRAINFUCK_ROOT_DIR}/output.txt", "r") as f:
         output = f.read()
-        # console.print('Hello world!\n')
-        # console.print(repr(output))
 
         if "Hello world!\n" == output:
             print_beatiful_log("BRAINF**K TEST PASSED", "bold green")
@@ -289,21 +290,11 @@ def test_brainfuck_language():
             console.print(
                 "Test failed, maybe your mirror cannot use or your internet is not good.And you can check hello.any file and try again."
             )
+            print_beatiful_log("Here is the output of the program:", "bold yellow")
+            console.print(output)
+            print_beatiful_log("Please check your output!.", "bold yellow")
             print_beatiful_log("BRAINF**K TEST FAILED", "bold red")
             return
-
-    # console.print("Cleaning up...")
-    # # os.chdir("..")
-    # # os.system("rmdir /s /q  Python-Brainfuck")
-
-    # try:
-    #     shutil.rmtree("./test-cache/Python-Brainfuck")
-    # except OSError as e:
-    #     print(
-    #         f"FUCKIT! Cannot deleted ./test-cache/Python-Brainfuck directory by shutil.rmtree() method \n because [[ {e} ]].\n But don't be worried.\n =============[ Trying force delete... ]============",
-    #     )
-    #     force_remove_dir_contents("./test-cache/Python-Brainfuck")
-    #     console.print("Cleaned up!", style="bold green")
 
 
 @test_function("C")
@@ -396,7 +387,7 @@ def summary():
 
 @test_function("ALL")
 def main():
-    check_the_environment()
+    check_the_environment_and_init()
     test_python_language()
     test_c_language()
     test_cpp_language()
