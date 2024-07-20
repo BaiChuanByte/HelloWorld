@@ -40,86 +40,13 @@ console = console.Console()
 
 PYTHON_OR_PYTHON3 = "python"
 
-# BF_GEI_MIRROR = "https://github.com/pocmo/Python-Brainfuck.git"
-# BF_MAIN_FILE = "brainfuck.py"
-
-test_language_list = ["python", "c++", "c", "brainfuck"]
+test_language_list = ["python", "c++", "c", "brainfuck", "befunge"]
 done_languages = []
 
 TEST_CACHE_DIR = "./test-cache"
+TEST_CACHE_ESOLANGS_DIR = "./test-cache/esolangs"
 
 MAIN_MIRROR = "https://github.com/fexcode/esolangs"
-
-"""
-
-PYTHON_OR_PYTHON3 = "python"
-
-mirrors = {
-    "brainfuck": [
-        {
-            "NEED_LANGUAGE": "python" if PYTHON_OR_PYTHON3 == "python" else "python3",
-            "GIT_MIRROR": "https://github.com/pocmo/Python-Brainfuck.git",
-            "HOW_TO_RUN": "brainfuck.py",
-        },
-    ]
-}
-
-BRAINFUCK_GIT_MIRROR = (
-    "https://github.com/pocmo/Python-Brainfuck"  # MUST WRITE BY PYTHON!!!
-)
-BRAINFUCK_MAIN_FILE_AND_ARGS = "brainfuck.py"
-"""
-
-"""
-def get_or_ask_config():
-    # check config.json file is exist
-    global mirrors
-    if os.path.isfile("config.json"):
-        with open("config.json", "r") as f:
-            global_config = json.load(f)
-            return global_config
-    else:
-        config = {}
-
-        console.print("No config.json file found", style="bold red")
-        console.print("Createing...")
-
-        # Create python config
-        for i in range(3):
-            p_or_p3 = console.input(
-                "seting python or python3 as default(python/python3): "
-            )
-            if p_or_p3_l := (p_or_p3.lower()) not in ["python", "python3"]:
-                console.print(
-                    "Invalid input, seting python as default, please try again.",
-                    style="bold red",
-                )
-                continue
-            config["python-or-python3"] = p_or_p3_l
-
-        # Crate brainfuck config
-        for i in range(3):
-            console.print("\nPlease choose a brainfuck mirror: ")
-
-            for i, mirror in enumerate(mirrors["brainfuck"]):
-                console.print(f"{i+1}. {mirror['GIT_MIRROR']}")
-
-            choice = console.input("Please choose a mirror by number: ")
-            if not (0 < int(choice) <= len(mirrors["brainfuck"])):
-                console.print(
-                    "Invalid input, seting the first mirror as default, please try again.",
-                    style="bold red",
-                )
-                continue
-            mirror = mirrors["brainfuck"][int(choice) - 1]
-            config["brainfuck"] = {}
-            config["brainfuck"]["GIT_MIRROR"] = mirror["GIT_MIRROR"]
-            config["brainfuck"]["HOW_TO_RUN"] = mirror["HOW_TO_RUN"]
-
-            with open("config.json", "w") as f:
-                json.dump(config, f, indent=4)
-            return config
-"""
 
 # CONFIG = get_or_ask_config()
 
@@ -175,6 +102,7 @@ def check_the_environment_and_init():
     if not shutil.which("gcc"):
         console.print("gcc is not installed on your system.", style="bold red")
         test_language_list.remove("c")
+        test_language_list.remove("befunge")
 
     # Check if g++ is installed
     if not shutil.which("g++"):
@@ -185,6 +113,7 @@ def check_the_environment_and_init():
     if not shutil.which("git"):
         console.print("git is not installed on your system.", style="bold red")
         test_language_list.remove("brainfuck")
+        test_language_list.remove("befunge")
     else:
         TEST_CACHE_ESOLANGS_DIR = "./test-cache/esolangs/"
         print_beatiful_log("Cloning the esolangs interpreters...", "bold blue")
@@ -258,45 +187,6 @@ def test_python_language():
             print_beatiful_log("PYTHON TEST FAILED", "bold red")
 
 
-@test_function("Brainfuck")
-def test_brainfuck_language():
-    # esolang interpreters have installed in ./test-cache/esolangs already.
-
-    print_beatiful_log("TESTING BRAINF**K", "bold blue")
-
-    TEST_CACHE_ESOLANGS_DIR = "./test-cache/esolangs"
-
-    BRAINFUCK_ROOT_DIR = f"{TEST_CACHE_ESOLANGS_DIR}/brainfuck"
-
-    shutil.copyfile("./hello.any", f"{BRAINFUCK_ROOT_DIR}/hello.bf")
-
-    os.system(
-        f"python {BRAINFUCK_ROOT_DIR}/main.py {BRAINFUCK_ROOT_DIR}/hello.bf > {BRAINFUCK_ROOT_DIR}/output.txt"
-        if PYTHON_OR_PYTHON3 == "python"
-        else f"python3 {BRAINFUCK_ROOT_DIR}/main.py {BRAINFUCK_ROOT_DIR}/hello.bf > {BRAINFUCK_ROOT_DIR}/output.txt"
-    )
-    console.log(
-        f"Output of the program is in {BRAINFUCK_ROOT_DIR}/output.txt file, but we will delete it after we checked the output."
-    )
-
-    # Check if the output is correct
-    with open(f"{BRAINFUCK_ROOT_DIR}/output.txt", "r") as f:
-        output = f.read()
-
-        if "Hello world!\n" == output:
-            print_beatiful_log("BRAINF**K TEST PASSED", "bold green")
-            done_languages.append("brainfuck")
-        else:
-            console.print(
-                "Test failed, maybe your mirror cannot use or your internet is not good.And you can check hello.any file and try again."
-            )
-            print_beatiful_log("Here is the output of the program:", "bold yellow")
-            console.print(output)
-            print_beatiful_log("Please check your output!.", "bold yellow")
-            print_beatiful_log("BRAINF**K TEST FAILED", "bold red")
-            return
-
-
 @test_function("C")
 def test_c_language():
     print_beatiful_log("TESTING C", "bold blue")
@@ -367,17 +257,108 @@ def test_cpp_language():
             return
 
 
+@test_function("Brainfuck")
+def test_brainfuck_language():
+    # esolang interpreters have installed in ./test-cache/esolangs already.
+
+    print_beatiful_log("TESTING BRAINF**K", "bold blue")
+
+    BRAINFUCK_ROOT_DIR = f"{TEST_CACHE_ESOLANGS_DIR}/brainfuck"
+
+    shutil.copyfile("./hello.any", f"{BRAINFUCK_ROOT_DIR}/hello.bf")
+
+    os.system(
+        f"python {BRAINFUCK_ROOT_DIR}/main.py {BRAINFUCK_ROOT_DIR}/hello.bf > {BRAINFUCK_ROOT_DIR}/output.txt"
+        if PYTHON_OR_PYTHON3 == "python"
+        else f"python3 {BRAINFUCK_ROOT_DIR}/main.py {BRAINFUCK_ROOT_DIR}/hello.bf > {BRAINFUCK_ROOT_DIR}/output.txt"
+    )
+    console.log(
+        f"Output of the program is in {BRAINFUCK_ROOT_DIR}/output.txt file, but we will delete it after we checked the output."
+    )
+
+    # Check if the output is correct
+    with open(f"{BRAINFUCK_ROOT_DIR}/output.txt", "r") as f:
+        output = f.read()
+
+        if "Hello world!\n" == output:
+            print_beatiful_log("BRAINF**K TEST PASSED", "bold green")
+            done_languages.append("brainfuck")
+        else:
+            console.print(
+                "Test failed, maybe your mirror cannot use or your internet is not good.And you can check hello.any file and try again."
+            )
+            print_beatiful_log("Here is the output of the program:", "bold yellow")
+            console.print(output)
+            print_beatiful_log("Please check your output!.", "bold yellow")
+            print_beatiful_log("BRAINF**K TEST FAILED", "bold red")
+            return
+
+
+@test_function("Befunge")
+def test_befunge_language():
+    print_beatiful_log("TESTING BEFUNGE", "bold blue")
+
+    BEFUNGE_ROOT_DIR = f"{TEST_CACHE_ESOLANGS_DIR}/befunge"
+
+    # copy hello.any file to {BEFUNGE_ROOT_DIR}/hello.bf
+    shutil.copyfile("./hello.any", f"{BEFUNGE_ROOT_DIR}/hello.bf")
+
+    # to run befunge, we need to have gcc installed.
+
+    # First we need to compile the main.c file.
+    console.log("Compiling main.c file...")
+    os.system(
+        f"gcc -o {BEFUNGE_ROOT_DIR}/main.exe {BEFUNGE_ROOT_DIR}/main.c"
+        if os.name == "nt"
+        else f"gcc -o {BEFUNGE_ROOT_DIR}/main {BEFUNGE_ROOT_DIR}/main.c"
+    )
+
+    # Then we can run the program.
+    # To run hello.bf , just run `main.exe hello.bf`
+    console.log("Running the program...")
+    os.system(
+        c := (
+            f'powershell -Command "{BEFUNGE_ROOT_DIR}/main.exe {BEFUNGE_ROOT_DIR}/hello.bf > {BEFUNGE_ROOT_DIR}/output.txt"'
+            if os.name == "nt"
+            else f"{BEFUNGE_ROOT_DIR}/main {BEFUNGE_ROOT_DIR}/hello.bf > {BEFUNGE_ROOT_DIR}/output.txt"
+        )
+    )
+    console.log(f"Ran {c}")
+
+    # Check if the output is correct
+    console.log("Checking the output...")
+    with open(f"{BEFUNGE_ROOT_DIR}/output.txt", "r",encoding="utf-16") as f:
+        output = f.read()
+        if "Hello world!\n" == output:
+            print_beatiful_log("BEFUNGE TEST PASSED", "bold green")
+            done_languages.append("befunge")
+        else:
+            console.print(
+                "Test failed, maybe your mirror cannot use or your internet is not good.And you can check hello.any file and try again."
+            )
+            print_beatiful_log("Here is the output of the program:", "bold yellow")
+            console.print(output)
+            print_beatiful_log("\nPlease check your output!.", "bold yellow")
+
+
 def summary():
     print_beatiful_log("SUMMARY", "bold blue")
     console.print("We have tested the following languages:", style="bold blue")
     for lang in test_language_list:
         if lang in done_languages:
+            done_languages.remove(lang)
             if lang == "brainfuck":
                 console.print(f"\t{lang} \t[PASSED]", style="bold green")
+                continue
+            if lang == "befunge":
+                console.print(f"\t{lang} \t[PASSED]", style="bold green")
+                continue
             else:
                 console.print(f"\t{lang} \t\t[PASSED]", style="bold green")
         else:
             if lang == "brainfuck":
+                console.print(f"\t{lang} \t[FAILED]", style="bold red")
+            if lang == "befunge":
                 console.print(f"\t{lang} \t[FAILED]", style="bold red")
             else:
                 console.print(f"\t{lang} \t\t[FAILED]", style="bold red")
@@ -388,10 +369,13 @@ def summary():
 @test_function("ALL")
 def main():
     check_the_environment_and_init()
+
     test_python_language()
     test_c_language()
     test_cpp_language()
     test_brainfuck_language()
+    test_befunge_language()
+
     delete_test_cache_directory()
     summary()
 
