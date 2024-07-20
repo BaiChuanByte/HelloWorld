@@ -46,7 +46,9 @@ done_languages = []
 TEST_CACHE_DIR = "./test-cache"
 TEST_CACHE_ESOLANGS_DIR = "./test-cache/esolangs"
 
-MAIN_MIRROR = "https://github.com/fexcode/esolangs"
+GITEE_MIRROR = "https://gitee.com/fxbd/esolangs"
+GITHUB_MIRROR = "https://github.com/fexcode/esolangs"
+
 
 # CONFIG = get_or_ask_config()
 
@@ -88,6 +90,31 @@ def force_remove_dir_contents(path):
     os.rmdir(path)
 
 
+def clone_esolang_interpreters():
+    TEST_CACHE_ESOLANGS_DIR = "./test-cache/esolangs/"
+    print_beatiful_log("Cloning the esolangs interpreters...", "bold blue")
+    try:
+            os.system(f"git clone {GITHUB_MIRROR} {TEST_CACHE_ESOLANGS_DIR} ")
+            print_beatiful_log("Cloned the esolangs interpreters!", "bold green")
+            print_beatiful_log("Deleting the .git directory...", "bold blue")
+            force_remove_dir_contents(f"{TEST_CACHE_ESOLANGS_DIR}/.git")
+    except OSError as e:
+            console.print(
+                "Cannot clone from github.com. Trying to clone from gitee.com...",
+                style="bold red",
+            )
+            try:
+                os.system(f"git clone {GITEE_MIRROR} {TEST_CACHE_ESOLANGS_DIR} ")
+                print_beatiful_log("Deleting the .git directory...", "bold blue")
+                force_remove_dir_contents(f"{TEST_CACHE_ESOLANGS_DIR}/.git")
+            except OSError as e:
+                console.print(
+                    "Cannot clone from gitee.com. Please check your internet connection or try again later.",
+                    style="bold red",
+                )
+                sys.exit(114514)
+        
+
 def check_the_environment_and_init():
     global test_language_list
 
@@ -111,23 +138,15 @@ def check_the_environment_and_init():
 
     # Check if git is installed
     if not shutil.which("git"):
-        console.print("git is not installed on your system.", style="bold red")
+        console.print(
+            "Sorry, git is not installed on your system.Please install it first.",
+            style="bold red",
+        )
         test_language_list.remove("brainfuck")
         test_language_list.remove("befunge")
+        sys.exit(114514)
     else:
-        TEST_CACHE_ESOLANGS_DIR = "./test-cache/esolangs/"
-        print_beatiful_log("Cloning the esolangs interpreters...", "bold blue")
-        try:
-            os.system(f"git clone {MAIN_MIRROR} {TEST_CACHE_ESOLANGS_DIR} ")
-            print_beatiful_log("Cloned the esolangs interpreters!", "bold green")
-            print_beatiful_log("Deleting the .git directory...", "bold blue")
-            force_remove_dir_contents(f"{TEST_CACHE_ESOLANGS_DIR}/.git")
-        except OSError as e:
-            console.print(
-                "Cannot clone from github.com. Please check your internet connection or mirrors.",
-                style="bold red",
-            )
-            return
+        clone_esolang_interpreters()
 
     # Check hello.any file is present and it is in the current directory
     if not os.path.isfile("hello.any"):
@@ -327,7 +346,7 @@ def test_befunge_language():
 
     # Check if the output is correct
     console.log("Checking the output...")
-    with open(f"{BEFUNGE_ROOT_DIR}/output.txt", "r",encoding="utf-16") as f:
+    with open(f"{BEFUNGE_ROOT_DIR}/output.txt", "r", encoding="ascii") as f:
         output = f.read()
         if "Hello world!\n" == output:
             print_beatiful_log("BEFUNGE TEST PASSED", "bold green")
