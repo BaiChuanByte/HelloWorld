@@ -4,7 +4,7 @@ To run this script, you need to have Python,gcc,g++ and git installed on your sy
 And install the following pip packages:
 - rich
 
-(just run `pip install rich in your terminal)
+(just run `pip install rich` in your terminal)
 
 we will help you install esolangs by git
 
@@ -125,19 +125,23 @@ def clone_esolang_interpreters():
                 f"Cannot clone from github.com, too. \n{e}",
                 style="bold red",
             )
-            sys.exit(114514)
+
+            try:
+                os.system(f"git clone {GITEE_MIRROR} {TEST_CACHE_ESOLANGS_DIR} ")
+                print_beatiful_log("Deleting the .git directory...", "bold blue")
+                force_remove_dir_contents(f"{TEST_CACHE_ESOLANGS_DIR}/.git")
+            except OSError as e:
+                console.print(
+                    "Cannot clone from gitee.com. Please check your internet connection or try again later.",
+                    style="bold red",
+                )
+                sys.exit(114514)
 
 
 def check_the_environment_and_init():
     global test_language_list
 
     console.print("Checking the environment...", style="bold blue")
-    # Check if Python is installed
-    if not shutil.which("python"):
-        console.print("Python is not installed on your system.", style="bold red")
-        test_language_list.remove("python")
-        test_language_list.remove("brainfuck")
-
     # Check if gcc is installed
     if not shutil.which("gcc"):
         console.print("gcc is not installed on your system.", style="bold red")
