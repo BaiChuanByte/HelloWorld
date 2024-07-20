@@ -4,7 +4,7 @@ To run this script, you need to have Python,gcc,g++ and git installed on your sy
 And install the following pip packages:
 - rich
 
-(just run `pip install rich in your terminal)
+(just run `pip install rich` in your terminal)
 
 we will help you install esolangs by git
 
@@ -113,18 +113,12 @@ def clone_esolang_interpreters():
                     style="bold red",
                 )
                 sys.exit(114514)
-        
+
 
 def check_the_environment_and_init():
     global test_language_list
 
     console.print("Checking the environment...", style="bold blue")
-    # Check if Python is installed
-    if not shutil.which("python"):
-        console.print("Python is not installed on your system.", style="bold red")
-        test_language_list.remove("python")
-        test_language_list.remove("brainfuck")
-
     # Check if gcc is installed
     if not shutil.which("gcc"):
         console.print("gcc is not installed on your system.", style="bold red")
