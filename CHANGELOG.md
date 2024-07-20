@@ -15,3 +15,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - English documents: README.md, CHANGELOG.md and CONTRIBUTING.md.
 - Chinese documents: README_zh.md, CHANGELOG_zh.md and CONTRIBUTING_zh.md.
 - LICENSE.
+- test-script.py
+- Brfunge language.
+

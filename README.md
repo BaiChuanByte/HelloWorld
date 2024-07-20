@@ -38,6 +38,29 @@ So easy, isn't it?
 
 If the output is not "Hello, world!", please report a bug. Thanks!
 
+## A new way to run it
+
+Maybe you don't have any esolang interpreters installed.<br>
+But don't be worried, you can still run it with test `test-script.py`!
+
+There is a `test-script.py` file in the root directory of this project.<br>
+It can help you run **all** the languages we support. So cool right?
+
+To run it, just do like this:
+1. clone this repository.  `shell git clone (-b dev) https://github.com/BaiChuanByte/HelloWorld.git`
+1. `cd` to the root directory of this project. 
+2. install pip packages.   `pip3 install -r requirements.txt` or `pip install -r requirements.txt`
+3. run the test script.    `python test-script.py` or `python3 test-script.py`
+<br>
+### Note: 
+You need to install the required interpreters or compilers before running the test script:
+- Python (python3, pip3)
+- C (gcc)
+- C++ (g++)
+
+If you want to know more about test-script, 
+see [TEST-SCRIPT.md](./TEST-SCRIPT.md).
+
 ## License
 This programm is licensed under the terms of the WTFPL
 (DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE).
