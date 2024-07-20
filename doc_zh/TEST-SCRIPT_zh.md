@@ -40,6 +40,6 @@ TA可以帮助您运行**任何**我们支持的语言。<br>
     1. 把程序的输出和期望输出对比,保存到 `test-caches/<语言名>/output.txt`
         > 期望输出:<br>
         > "Hello world!\n"<br>
-        > 详见 [CONTRIBUTING_zh.md](./CONTRIBUTING_zh.md#我我们可以做什么)
+        > 详见 [CONTRIBUTING_zh.md](./CONTRIBUTING_zh.md)
 5. 打印测试结果
 

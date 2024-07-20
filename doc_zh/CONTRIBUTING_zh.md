@@ -2,19 +2,19 @@
 
 ## 贡献步骤
 1. Fork 此项目仓库；
-﻿
+
 2. 根据您要贡献的内容，参考[我/我们可以做什么？](#contribution-content)中的说明，在相应模块添加内容。
-﻿
+
 3. 提交PR。如有必要，请附加详细的内容说明。
 
-## 我/我们可以做什么？ 
+## 我/我们可以做什么？  <a name="contribution-content"></a>
 1. 您可以为该项目增添新的支持语言。
 
    - 在hello.any文件中编辑。确保其他支持的语言仍旧可用。
 
    - 程序输出应是“Hello world!”，没有逗号，仅首字母“H”大写。感叹号应采用半角。
 
-   （注：这就是Python3.x“import __hello__”的输出。）
+   （注：这就是Python3.x“import \_\_hello\_\_”的输出。）
 
    - 别忘记更改LANGUAGES.md文件。
 

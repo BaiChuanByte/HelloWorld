@@ -16,7 +16,7 @@
    - The program output should be "Hello world!" without commas, only capitalized with the first letter "H".
    The exclamation mark should be half angled.
 
-   (Note: This is the output of Python3.x "import __hello__".)
+   (Note: This is the output of Python3.x "import \_\_hello\_\_".)
 
    - Don't forget to modify the LANGUAGES.md file.
 

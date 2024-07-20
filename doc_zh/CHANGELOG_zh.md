@@ -9,9 +9,11 @@
 
 ### 添加的
 
-- Python语言支持。
-- C/C++语言支持。
+- Befunge语言支持。
 - Brainfuck语言支持。
+- C/C++语言支持。
+- Python语言支持。
 - 英文文档: README.md, CHANGELOG.md和CONTRIBUTING.md。
 - 中文文档: README_zh.md, CHANGELOG_zh.md和CONTRIBUTING_zh.md。
+- 测试脚本：test-script.py。
 - LICENSE（许可）。
