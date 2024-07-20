@@ -38,6 +38,28 @@
 
 如果没有输出“Hello world!”，请提交一个BUG。谢谢！
 
+## 用一种新的方式运行
+如果您没有安装任何 esolang 的解释器或编译器，但仍然想运行这个项目，请不要担心。<br>
+您可能注意到了，这个项目的根目录下有一个 `test-script.py` 文件。
+TA可以帮助您运行**任何**我们支持的语言。<br>
+
+要运行它，请按照以下步骤操作：
+1. 克隆这个仓库。  `shell git clone (-b dev) https://github.com/BaiChuanByte/HelloWorld.git`
+2. 进入这个项目的根目录。
+3. 安装pip依赖包。   `pip3 install -r requirements.txt` 或 `pip install -r requirements.txt`
+4. 运行测试脚本。    `python test-script.py` 或 `python3 test-script.py`
+
+
+### 注意：
+您需要在运行测试脚本之前安装所需的解释器或编译器：
+- Python (python3, pip3)
+- C (gcc)
+- C++ (g++)
+
+
+如果您想了解更多关于测试脚本的信息，请参阅[TEST-SCRIPT.md](./doc_zh/TEST-SCRIPT.md)。
+
+
 ## 许可
 该程序采用WTFPL
 （DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE，“你tm想做啥都行”开源许可）许可。
