@@ -69,7 +69,7 @@ str-long cannot be more than 40
 """
 def print_beatiful_log(text: str, color: str = "blod white", long: int = 50):
     text = f"[ {text} ]"
-    equals = "=" * (long - len(text)) // 2
+    equals = "=" * ((long - len(text)) // 2)
 
     console.print(f"{equals}{text}{equals}", style=color)
 
@@ -226,7 +226,8 @@ def test_c_language():
 
     # Running hello.exe file
     console.log("Running hello.exe file...")
-    os.system("{target} > {output}")
+    os.system(f"{target} > {output}")
+
 
     # Check if the output is correct
     console.log("Checking the output...")
@@ -253,11 +254,11 @@ def test_cpp_language():
 
     # Compile hello.cpp file
     console.log(f"Compiling {cpp_source} file...")
-    os.system("g++ -o {target} {cpp_source}")
+    os.system(f"g++ -o {target} {cpp_source}")
 
     # Running hello.exe file
     console.log(f"Running {target} file...")
-    os.system("{target} > {output}")
+    os.system(f"{target} > {output}")
 
     # Check if the output is correct
     console.log("Checking the output...")
@@ -282,7 +283,7 @@ def test_brainfuck_language():
     output      = os.path.join(root_dir, "output.txt")
 
     # Copy hello.any file to ./test-caches/esolangs/brainfuck/hello.bf
-    shutil.copyfile(SOURCE_PATH, BRAINFUCK_FILE)
+    shutil.copyfile(SOURCE_PATH, bf_file)
 
     # Running hello.bf file
     os.system(f"{PYTHON_INTERPRETER} {interpreter} {bf_file} > {output}")
@@ -328,14 +329,14 @@ def test_befunge_language():
     # To run hello.bf, just run `{interpreter} hello.bf`
     console.log("Running the program...")
     os.system(
-        c := (f"{interpreter} {bf_file} > {output}")
+        f"{interpreter} {bf_file} > {output}"
     )
-    console.log(f"Ran {c}")
+
 
     # Check if the output is correct
     console.log("Checking the output...")
     with open(
-        f"{output}", "r", encoding="utf-16-le", errors="ignore"
+        f"{output}", "r", encoding="utf-8", errors="ignore"
     ) as f:
         output = f.read()
 
@@ -359,13 +360,16 @@ def summary():
 
     console.print("We have tested the following languages:", style="bold blue")
 
+    # helps us align the language names 
+    max_lang_length = max(len(lang) for lang in test_language_list)  # to find the longest language name
+
     for lang in test_language_list:
 
         if lang in done_languages:
             done_languages.remove(lang)
-            console.print(f"\t{lang} \t\t[PASSED]", style="bold green")
+            console.print(f"\t{lang.ljust(max_lang_length + 2) } \t[PASSED]", style="bold green")
         else:
-            console.print(f"\t{lang} \t\t[FAILED]", style="bold red")
+            console.print(f"\t{lang.ljust(max_lang_length + 2) } \t[FAILED]", style="bold red")
 
     print_beatiful_log("ALL DONE! | THANKS FOR USING!", "bold green")
 
