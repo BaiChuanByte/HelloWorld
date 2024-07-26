@@ -6,142 +6,136 @@ And install the following pip packages:
 
 (just run `pip install rich` in your terminal)
 
-we will help you install esolangs by git
+
+If the command of the Python interpreter is not "Python", please modify the
+"PYTHON_INTERPRETER" variable.
+
+We will help you install esolangs by git.
 
 @Author: fexcode
 @Date: 2024.7.17 ~ 2024.7.18
 """
 
 import os
-from rich import console
-import shutil
-import sys
-import os
-import stat
-import time
 import re
+import shutil
+import stat
+import sys
+import time
+from typing import List, Callable
+
+from rich import console
 
 
-def test_function(lang):
-    def decorator(func):
-        def wrapper(*args, **kwargs):
+# Fill it out properly!
+PYTHON_INTERPRETER: str = "python"
+
+SOURCE_PATH            : str = os.path.join(".", "hello.any")
+TEST_CACHE_DIR         : str = os.path.join(".", "test-caches")
+TEST_CACHE_ESOLANGS_DIR: str = os.path.join(".", "test-caches", "esolangs")
+
+GITEE_MIRROR : str = "https://gitee.com/fxbd/esolangs"
+GITHUB_MIRROR: str = "https://github.com/fexcode/esolangs"
+
+
+console = console.Console()
+
+test_language_list: List[str] = ["python", "c++", "c", "brainfuck", "befunge"]
+done_languages    : List[str] = []
+
+
+def error_exit():
+    sys.exit(114514)
+
+
+def timer(name: str):
+    def decorator(func: Callable[[], None]):
+        def wrapper():
             start_time = time.time()
-            result = func(*args, **kwargs)
+            func()
             end_time = time.time()
+
             elapsed_time = end_time - start_time
-            print(f"{lang}-test used: {elapsed_time:.6f}s")
-            return result
+            print(f"{name}-test used: {elapsed_time:.6f}s")
 
         return wrapper
 
     return decorator
 
 
-console = console.Console()
+"""
+to print ===========[ text ]===========  total long is 50 and text is in middle
+str-long cannot be more than 40
+"""
+def print_beatiful_log(text: str, color: str = "blod white", long: int = 50):
+    text = f"[ {text} ]"
+    equals = "=" * ((long - len(text)) // 2)
 
-PYTHON_OR_PYTHON3 = "python"
-
-test_language_list = ["python", "c++", "c", "brainfuck", "befunge"]
-done_languages = []
-
-TEST_CACHE_DIR = "./test-caches"
-TEST_CACHE_ESOLANGS_DIR = "./test-caches/esolangs"
-
-GITEE_MIRROR = "https://gitee.com/fxbd/esolangs"
-GITHUB_MIRROR = "https://github.com/fexcode/esolangs"
+    console.print(f"{equals}{text}{equals}", style=color)
 
 
-# CONFIG = get_or_ask_config()
-
-
-def print_beatiful_log(text, color="blod white", long=52):
-    # to print ===========[ text ]===========  total long is 50 and text is in middle
-    # str-long cannot be more than 40
-    half_long = long // 2
-    str_long = len(text) + 4
-    half_square_long = half_long - str_long // 2
-
-    console.print("=" * half_square_long, style=color, end="")
-    console.print(f"[ {text} ]", style=color, end="")
-    console.print("=" * half_square_long, style=color)
-
-
-def if_the_language_is_supported(language):
-    if language in test_language_list:
-        return True
-    else:
-        return False
-
-
-def force_remove_dir_contents(path):
-    # 遍历目录树
+def force_remove_dir_contents(path: str):
     for root, dirs, files in os.walk(path, topdown=False):
-        # 删除所有文件
+
         for name in files:
             file_path = os.path.join(root, name)
-            # 尝试设置文件为可写
             os.chmod(file_path, stat.S_IWRITE)
-            # 删除文件
             os.remove(file_path)
-        # 删除所有空目录
+
         for name in dirs:
             dir_path = os.path.join(root, name)
             os.rmdir(dir_path)
-    # 最后删除根目录
+
     os.rmdir(path)
 
 
+def clone_esolang_interpreters_for_mirror(mirror: str):
+    os.system(f"git clone {mirror} {TEST_CACHE_ESOLANGS_DIR} ")
+    print_beatiful_log("Cloned the esolangs interpreters!", "bold green")
+    print_beatiful_log("Deleting the .git directory...", "bold blue")
+
+    force_remove_dir_contents(os.path.join(TEST_CACHE_ESOLANGS_DIR, ".git"))
+
+
 def clone_esolang_interpreters():
-    TEST_CACHE_ESOLANGS_DIR = "./test-caches/esolangs"
-
-    if os.path.exists(TEST_CACHE_DIR):
-        console.print(
-            f"The {TEST_CACHE_DIR} directory already exists. Deleting it...",
-            style="bold yellow",
-        )
-        force_remove_dir_contents(TEST_CACHE_DIR)
-
     print_beatiful_log("Cloning the esolangs interpreters...", "bold blue")
+
     try:
-
-        os.system(f"git clone {GITEE_MIRROR} {TEST_CACHE_ESOLANGS_DIR} ")
-        print_beatiful_log("Cloned the esolangs interpreters!", "bold green")
-        print_beatiful_log("Deleting the .git directory...", "bold blue")
-
-        force_remove_dir_contents(f"{TEST_CACHE_ESOLANGS_DIR}/.git")
+        clone_esolang_interpreters_for_mirror(GITEE_MIRROR)
     except OSError as e:
         console.print(
-            f"Cannot clone from gitee.com. \n{e}\nTrying to clone from github.com...",
+            f"Cannot clone from gitee.com.\n{e}\nTrying to clone from github.com...",
             style="bold red",
         )
-        try:
-            os.system(f"git clone {GITHUB_MIRROR} {TEST_CACHE_ESOLANGS_DIR} ")
-            print_beatiful_log("Cloned the esolangs interpreters!", "bold green")
-            print_beatiful_log("Deleting the .git directory...", "bold blue")
 
-            force_remove_dir_contents(f"{TEST_CACHE_ESOLANGS_DIR}/.git")
+        try:
+            clone_esolang_interpreters_for_mirror(GITHUB_MIRROR)
         except OSError as e:
             console.print(
-                f"Cannot clone from github.com, too. \n{e}",
+                f"Cannot clone from github.com, too.\n{e}\nPlease check your internet connection or try again later.",
                 style="bold red",
             )
-
-            try:
-                os.system(f"git clone {GITEE_MIRROR} {TEST_CACHE_ESOLANGS_DIR} ")
-                print_beatiful_log("Deleting the .git directory...", "bold blue")
-                force_remove_dir_contents(f"{TEST_CACHE_ESOLANGS_DIR}/.git")
-            except OSError as e:
-                console.print(
-                    "Cannot clone from gitee.com. Please check your internet connection or try again later.",
-                    style="bold red",
-                )
-                sys.exit(114514)
+            error_exit()
 
 
-def check_the_environment_and_init():
-    global test_language_list
-
+def check_the_environment():
     console.print("Checking the environment...", style="bold blue")
+
+    # Check hello.any file is present and it is in the current directory
+    if not os.path.isfile(SOURCE_PATH):
+        console.print(
+            f"{SOURCE_PATH} file is not present in the current directory.", style="bold red"
+        )
+        error_exit()
+
+    # Check if git is installed
+    if not shutil.which("git"):
+        console.print(
+            "Sorry, git is not installed on your system. Please install it first.",
+            style="bold red",
+        )
+        error_exit()
+
     # Check if gcc is installed
     if not shutil.which("gcc"):
         console.print("gcc is not installed on your system.", style="bold red")
@@ -153,35 +147,10 @@ def check_the_environment_and_init():
         console.print("g++ is not installed on your system.", style="bold red")
         test_language_list.remove("c++")
 
-    # Check if git is installed
-    if not shutil.which("git"):
-        console.print(
-            "Sorry, git is not installed on your system.Please install it first.",
-            style="bold red",
-        )
-        test_language_list.remove("brainfuck")
-        test_language_list.remove("befunge")
-        sys.exit(114514)
-    else:
-        clone_esolang_interpreters()
-
-    # Check hello.any file is present and it is in the current directory
-    if not os.path.isfile("hello.any"):
-        console.print(
-            "hello.any file is not present in the current directory.", style="bold red"
-        )
-        sys.exit(114514)
-
+    # Check if any language can test
     if not test_language_list:
         console.print("No language can test.", style="bold red")
-        sys.exit(114514)
-
-    # Create test-caches directory if it does not exist
-    if not os.path.exists("./test-caches"):
-        console.print("Creating test-caches directory...", style="bold bright_black")
-        os.makedirs("./test-caches")
-
-    # console.input("Please check your BRAINFUCK mirrors and press a key to continue.")
+        error_exit()
 
     console.print("Environment check Done!", style="bold green")
     console.print("We will test the following languages:", style="bold blue")
@@ -189,32 +158,48 @@ def check_the_environment_and_init():
         console.print("\t" + lang, style="bold bright_white")
 
 
+def init():
+    if os.path.exists(TEST_CACHE_DIR):
+        console.print(
+            f"The {TEST_CACHE_DIR} directory already exists. Deleting it...",
+            style="bold yellow",
+        )
+        force_remove_dir_contents(TEST_CACHE_DIR)
+
+        console.print("Creating test-caches directory...", style="bold bright_black")
+        os.makedirs(TEST_CACHE_DIR)
+
+    clone_esolang_interpreters()
+
+
 def delete_test_cache_directory():
     print_beatiful_log("Cleaning up...", "bold yellow")
-    try:
-        shutil.rmtree("./test-caches")
-    except OSError as e:
-        print(
-            f"FUCKIT! Cannot deleted ./test-caches directory by shutil.rmtree() method \n because [[ {e} ]].\n But don't be worried.",
-        )
-        print_beatiful_log("Trying force delete...", "bold yellow")
-        force_remove_dir_contents("./test-caches")
-        console.print("Cleaned up!", style="bold green")
 
-    print_beatiful_log("ALL TESTS HAS BEEN DONE!!!", "bold green")
+#   try:
+#       shutil.rmtree(TEST_CACHE_DIR)
+#   except OSError as e:
+#       print(
+#           f"FUCKIT! Cannot deleted {TEST_CACHE_DIR} directory by shutil.rmtree() method \n because [[ {e} ]].\n But don't be worried.",
+#       )
+#       print_beatiful_log("Trying force delete...", "bold yellow")
+
+    force_remove_dir_contents(TEST_CACHE_DIR)
+    console.print("Cleaned up!", style="bold green")
 
 
-@test_function("Python")
+@timer("Python")
 def test_python_language():
     print_beatiful_log("TESTING PYTHON", "bold blue")
 
-    # Python does not need any installation, just run the hello.any file
-    console.log("Running hello.any file...")
-    os.system("python hello.any > ./test-caches/python_output.txt")
+    output = os.path.join(TEST_CACHE_DIR, 'python-output.txt')
 
-    console.log("Checking the output...")
+    # Python does not need any installation, just run the hello.any file
+    console.log(f"Running {SOURCE_PATH} file...")
+    os.system(f"{PYTHON_INTERPRETER} hello.any > {output}")
+
     # Check if the output is correct
-    with open("./test-caches/python_output.txt", "r") as f:
+    console.log("Checking the output...")
+    with open(output, "r") as f:
         output = f.read()
         if "Hello world!\n" == output:
             print_beatiful_log("PYTHON TEST PASSED", "bold green")
@@ -223,97 +208,88 @@ def test_python_language():
             print_beatiful_log("PYTHON TEST FAILED", "bold red")
 
 
-@test_function("C")
+@timer("C")
 def test_c_language():
     print_beatiful_log("TESTING C", "bold blue")
 
-    console.log("Copying hello.any file...")
+    c_source = os.path.join(TEST_CACHE_DIR, "hello.c")
+    target   = os.path.join(TEST_CACHE_DIR, "hello") + (".exe" if os.name == "nt" else "")
+    output   = os.path.join(TEST_CACHE_DIR, "c_output.txt")
+
     # Copy hello.any file to ./test-caches/hello.c
-    shutil.copyfile("./hello.any", "./test-caches/hello.c")
+    console.log(f"Copying {SOURCE_PATH} file...")
+    shutil.copyfile(SOURCE_PATH, c_source)
 
-    console.log("Compiling hello.c file...")
     # Compile hello.c file
-    os.system(
-        "gcc -o ./test-caches/hello.exe ./test-caches/hello.c"
-        if os.name == "nt"
-        else "gcc -o ./test-caches/hello ./test-caches/hello.c"
-    )
+    console.log(f"Compiling {c_source} file...")
+    os.system(f"gcc -o {target} {c_source}")
 
+    # Running hello.exe file
     console.log("Running hello.exe file...")
-    os.system(
-        r".\test-caches\hello.exe > ./test-caches/c_output.txt"
-        if os.name == "nt"
-        else "./test-caches/hello > ./test-caches/c_output.txt"
-    )
+    os.system(f"{target} > {output}")
 
-    console.log("Checking the output...")
+
     # Check if the output is correct
-    with open("./test-caches/c_output.txt", "r") as f:
+    console.log("Checking the output...")
+    with open(output, "r") as f:
         output = f.read()
         if "Hello world!\n" == output:
             print_beatiful_log("C TEST PASSED", "bold green")
             done_languages.append("c")
         else:
             print_beatiful_log("C TEST FAILED", "bold red")
-            return
 
 
-@test_function("C++")
+@timer("C++")
 def test_cpp_language():
     print_beatiful_log("TESTING C++", "bold blue")
 
-    console.log("Copying hello.any file...")
+    cpp_source = os.path.join(TEST_CACHE_DIR, "hello.cpp")
+    target     = os.path.join(TEST_CACHE_DIR, "hello") + (".exe" if os.name == "nt" else "")
+    output     = os.path.join(TEST_CACHE_DIR, "cpp_output.txt")
+
     # Copy hello.any file to ./test-caches/hello.cpp
-    shutil.copyfile("./hello.any", "./test-caches/hello.cpp")
+    console.log(f"Copying {SOURCE_PATH} file...")
+    shutil.copyfile(SOURCE_PATH, cpp_source)
 
-    console.log("Compiling hello.cpp file...")
     # Compile hello.cpp file
-    os.system(
-        "g++ -o ./test-caches/hello.exe ./test-caches/hello.cpp"
-        if os.name == "nt"
-        else "g++ -o ./test-caches/hello ./test-caches/hello.cpp"
-    )
+    console.log(f"Compiling {cpp_source} file...")
+    os.system(f"g++ -o {target} {cpp_source}")
 
-    console.log("Running hello.exe file...")
-    os.system(
-        r".\test-caches\hello.exe > ./test-caches/cpp_output.txt"
-        if os.name == "nt"
-        else "./test-caches/hello > ./test-caches/cpp_output.txt"
-    )
+    # Running hello.exe file
+    console.log(f"Running {target} file...")
+    os.system(f"{target} > {output}")
 
-    console.log("Checking the output...")
     # Check if the output is correct
-    with open("./test-caches/cpp_output.txt", "r") as f:
+    console.log("Checking the output...")
+    with open(output, "r") as f:
         output = f.read()
         if "Hello world!\n" == output:
             print_beatiful_log("C++ TEST PASSED", "bold green")
             done_languages.append("c++")
         else:
             print_beatiful_log("C++ TEST FAILED", "bold red")
-            return
 
 
-@test_function("Brainfuck")
+@timer("Brainfuck")
 def test_brainfuck_language():
     # esolang interpreters have installed in ./test-caches/esolangs already.
 
     print_beatiful_log("TESTING BRAINF**K", "bold blue")
 
-    BRAINFUCK_ROOT_DIR = f"{TEST_CACHE_ESOLANGS_DIR}/brainfuck"
+    root_dir    = os.path.join(TEST_CACHE_ESOLANGS_DIR, "brainfuck")
+    interpreter = os.path.join(root_dir, "main.py")
+    bf_file     = os.path.join(root_dir, "hello.bf")
+    output      = os.path.join(root_dir, "output.txt")
 
-    shutil.copyfile("./hello.any", f"{BRAINFUCK_ROOT_DIR}/hello.bf")
+    # Copy hello.any file to ./test-caches/esolangs/brainfuck/hello.bf
+    shutil.copyfile(SOURCE_PATH, bf_file)
 
-    os.system(
-        f"python {BRAINFUCK_ROOT_DIR}/main.py {BRAINFUCK_ROOT_DIR}/hello.bf > {BRAINFUCK_ROOT_DIR}/output.txt"
-        if PYTHON_OR_PYTHON3 == "python"
-        else f"python3 {BRAINFUCK_ROOT_DIR}/main.py {BRAINFUCK_ROOT_DIR}/hello.bf > {BRAINFUCK_ROOT_DIR}/output.txt"
-    )
-    console.log(
-        f"Output of the program is in {BRAINFUCK_ROOT_DIR}/output.txt file, but we will delete it after we checked the output."
-    )
+    # Running hello.bf file
+    os.system(f"{PYTHON_INTERPRETER} {interpreter} {bf_file} > {output}")
 
     # Check if the output is correct
-    with open(f"{BRAINFUCK_ROOT_DIR}/output.txt", "r") as f:
+    with open(output, "r") as f:
         output = f.read()
 
         if "Hello world!\n" == output:
@@ -321,56 +297,50 @@ def test_brainfuck_language():
             done_languages.append("brainfuck")
         else:
             console.print(
-                "Test failed, maybe your mirror cannot use or your internet is not good.And you can check hello.any file and try again."
+                "Test failed, maybe your mirror cannot use or your internet is not good. "
+                "And you can check hello.any file and try again."
             )
             print_beatiful_log("Here is the output of the program:", "bold yellow")
             console.print(output)
             print_beatiful_log("Please check your output!.", "bold yellow")
             print_beatiful_log("BRAINF**K TEST FAILED", "bold red")
-            return
 
 
-@test_function("Befunge")
+@timer("Befunge")
 def test_befunge_language():
     print_beatiful_log("TESTING BEFUNGE", "bold blue")
 
-    BEFUNGE_ROOT_DIR = f"{TEST_CACHE_ESOLANGS_DIR}/befunge"
+    root_dir         = os.path.join(TEST_CACHE_ESOLANGS_DIR, "befunge")
+    interpreter_file = os.path.join(root_dir, "main.c")
+    interpreter      = os.path.join(root_dir, "main") + (".exe" if os.name == "nt" else "")
+    bf_file          = os.path.join(root_dir, "hello.bf")
+    output           = os.path.join(root_dir, "output.txt")
 
-    # copy hello.any file to {BEFUNGE_ROOT_DIR}/hello.bf
-    shutil.copyfile("./hello.any", f"{BEFUNGE_ROOT_DIR}/hello.bf")
+    # copy hello.any file to ./test-caches/esolangs/hello.bf
+    shutil.copyfile(SOURCE_PATH, bf_file)
 
     # to run befunge, we need to have gcc installed.
 
     # First we need to compile the main.c file.
     console.log("Compiling main.c file...")
-    os.system(
-        f"gcc -o {BEFUNGE_ROOT_DIR}/main.exe {BEFUNGE_ROOT_DIR}/main.c"
-        if os.name == "nt"
-        else f"gcc -o {BEFUNGE_ROOT_DIR}/main {BEFUNGE_ROOT_DIR}/main.c"
-    )
+    os.system(f"gcc -o {interpreter} {interpreter_file}")
 
     # Then we can run the program.
-    # To run hello.bf , just run `main.exe hello.bf`
+    # To run hello.bf, just run `{interpreter} hello.bf`
     console.log("Running the program...")
     os.system(
-        c := (
-            f'powershell -Command "{BEFUNGE_ROOT_DIR}/main.exe {BEFUNGE_ROOT_DIR}/hello.bf > {BEFUNGE_ROOT_DIR}/output.txt"'
-            if os.name == "nt"
-            else f"{BEFUNGE_ROOT_DIR}/main {BEFUNGE_ROOT_DIR}/hello.bf > {BEFUNGE_ROOT_DIR}/output.txt"
-        )
+        f"{interpreter} {bf_file} > {output}"
     )
-    console.log(f"Ran {c}")
+
 
     # Check if the output is correct
     console.log("Checking the output...")
     with open(
-        f"{BEFUNGE_ROOT_DIR}/output.txt", "r", encoding="utf-16-le", errors="ignore"
+        f"{output}", "r", encoding="utf-8", errors="ignore"
     ) as f:
         output = f.read()
 
         target = "Hello world!"
-
-        # print(target,output)
 
         if target in output:
             print_beatiful_log("BEFUNGE TEST PASSED", "bold green")
@@ -387,32 +357,27 @@ def test_befunge_language():
 
 def summary():
     print_beatiful_log("SUMMARY", "bold blue")
+
     console.print("We have tested the following languages:", style="bold blue")
+
+    # helps us align the language names 
+    max_lang_length = max(len(lang) for lang in test_language_list)  # to find the longest language name
+
     for lang in test_language_list:
+
         if lang in done_languages:
             done_languages.remove(lang)
-            if lang == "brainfuck":
-                console.print(f"\t{lang} \t[PASSED]", style="bold green")
-                continue
-            if lang == "befunge":
-                console.print(f"\t{lang} \t[PASSED]", style="bold green")
-                continue
-            else:
-                console.print(f"\t{lang} \t\t[PASSED]", style="bold green")
+            console.print(f"\t{lang.ljust(max_lang_length + 2) } \t[PASSED]", style="bold green")
         else:
-            if lang == "brainfuck":
-                console.print(f"\t{lang} \t[FAILED]", style="bold red")
-            if lang == "befunge":
-                console.print(f"\t{lang} \t[FAILED]", style="bold red")
-            else:
-                console.print(f"\t{lang} \t\t[FAILED]", style="bold red")
+            console.print(f"\t{lang.ljust(max_lang_length + 2) } \t[FAILED]", style="bold red")
 
     print_beatiful_log("ALL DONE! | THANKS FOR USING!", "bold green")
 
 
-@test_function("ALL")
+@timer("ALL")
 def main():
-    check_the_environment_and_init()
+    check_the_environment()
+    init()
 
     test_python_language()
     test_c_language()
