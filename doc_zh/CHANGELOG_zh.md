@@ -5,7 +5,7 @@
 该文件格式基于[更新日志维护指南](https://keepachangelog.com/en/1.1.0/)。
 该项目遵循[语义化版本规范](https://semver.org/spec/v2.0.0.html)。
 
-## [待发布]
+## [0.1.0] - 2024-08-02
 
 ### 添加的
 
